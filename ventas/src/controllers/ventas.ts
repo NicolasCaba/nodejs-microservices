@@ -57,7 +57,7 @@ export const getVentas = async (req: Request, res: Response) => {
             };
         };
 
-        const response = await Venta.findAll();
+        const response = await Venta.findAll(filter);
         res.status(200).send(response);
     } catch (error) {
         res.status(500).send({ message: `No se pudo obtener el reporte de ventas`, error });

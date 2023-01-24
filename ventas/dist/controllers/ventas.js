@@ -76,7 +76,7 @@ const getVentas = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             };
         }
         ;
-        const response = yield venta_1.default.findAll();
+        const response = yield venta_1.default.findAll(filter);
         res.status(200).send(response);
     }
     catch (error) {
