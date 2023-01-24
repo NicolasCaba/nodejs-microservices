@@ -2,7 +2,7 @@ import cors from "cors";
 import express, { Application } from "express";
 import sequelize from "./config/dbConnection";
 import defineModelEntityRelationShip from "./models/modelEntityRelationship";
-// import routerCliente from "./routes/cliente";
+import routerVentas from "./routes/venta";
 
 
 class ExpressServer {
@@ -39,7 +39,7 @@ class ExpressServer {
     }
 
     routes(): void {
-        // this.app.use(this.basePath, routerCliente);
+        this.app.use(this.basePath, routerVentas);
     }
 
     listen(): void {

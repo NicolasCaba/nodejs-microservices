@@ -16,7 +16,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const dbConnection_1 = __importDefault(require("./config/dbConnection"));
 const modelEntityRelationship_1 = __importDefault(require("./models/modelEntityRelationship"));
-// import routerCliente from "./routes/cliente";
+const venta_1 = __importDefault(require("./routes/venta"));
 class ExpressServer {
     constructor() {
         this.basePath = '/api';
@@ -46,7 +46,7 @@ class ExpressServer {
         (0, modelEntityRelationship_1.default)();
     }
     routes() {
-        // this.app.use(this.basePath, routerCliente);
+        this.app.use(this.basePath, venta_1.default);
     }
     listen() {
         this.app.listen(this.port, () => {
