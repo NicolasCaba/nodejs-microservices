@@ -1,26 +1,39 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Carrito from "../models/carrito";
+import { CarritoInstance } from "../models/interfaces/carritoInterface";
 import { ProductoCarritoInstance } from "../models/interfaces/productoCarritoInterface";
 import ProductoCarrito from "../models/productoCarrito";
 
-const getCarrito = async (idCarrito: number) => {
+/**
+ * Obtener datos del carrito
+ * 
+ * @param idCarrito id del carrito
+ * @returns Promise<CarritoInstance | string>
+ */
+const getCarrito = async (idCarrito: number): Promise<CarritoInstance | string> => {
     const carrito = await Carrito.findByPk(idCarrito);
 
     if (!carrito) {
-        return [false, `El carrito con el id especificado no existe`];
+        return `El carrito con el id especificado no existe`;
     }
 
     return carrito;
 }
 
-const getProductosCarrito = async (idCarrito: number) => {
+/**
+ * Obtener la lista de productos dentro del carrito y la cantidad de los mismos
+ * 
+ * @param idCarrito id del carrito
+ * @returns Promise<[ProductoCarritoInstance[], number]>
+ */
+const getProductosCarrito = async (idCarrito: number): Promise<[ProductoCarritoInstance[], number]> => {
     const productosCarrito = await ProductoCarrito.findAll({
         where: {
             idCarrito: idCarrito
         }
     });
 
-    let cantidadProductosEnElCarrito = 0;
+    let cantidadProductosEnElCarrito: number = 0;
     if (productosCarrito) {
         for (let i = 0; i < productosCarrito.length; i++) {
             cantidadProductosEnElCarrito += productosCarrito[i].cantidad;
@@ -30,7 +43,41 @@ const getProductosCarrito = async (idCarrito: number) => {
     return [productosCarrito, cantidadProductosEnElCarrito];
 }
 
-const getInventario = async (idProducto: number) => {
+
+/**
+ * Obtener la lista de productos dentro del carrito y la cantidad de los mismos excluyendo la cantidad del producto a acutalizar
+ * 
+ * @param idCarrito id del carrito
+ * @param idProductoCarrito id del producto carrito a actualizar
+ * @returns Promise<[ProductoCarritoInstance[], number]>
+ */
+const getProductosCarritoUpdate = async (idCarrito: number, idProductoCarrito: number): Promise<[ProductoCarritoInstance[], number]> => {
+    const productosCarrito = await ProductoCarrito.findAll({
+        where: {
+            idCarrito: idCarrito
+        }
+    });
+
+    let cantidadProductosEnElCarrito = 0;
+    if (productosCarrito) {
+        for (let i = 0; i < productosCarrito.length; i++) {
+            if (productosCarrito[i].id !== idProductoCarrito) {
+                cantidadProductosEnElCarrito += productosCarrito[i].cantidad;
+            }
+        }
+    }
+
+    return [productosCarrito, cantidadProductosEnElCarrito];
+}
+
+
+/**
+ * Obtener datos del inventario
+ * 
+ * @param idProducto id del producto
+ * @returns Promise<AxiosResponse | string>
+ */
+const getInventario = async (idProducto: number): Promise<AxiosResponse | string> => {
     const inventario = await axios.get<{
         id: number,
         nombre: string,
@@ -48,17 +95,24 @@ const getInventario = async (idProducto: number) => {
     }>(`http://localhost:3000/api/producto/${idProducto}`);
 
     if (!inventario.data) {
-        return [false, `El id del producto no existe`];
+        return `El id del producto no existe`;
     }
 
     if (!inventario.data.inventario) {
-        return [false, `El producto que esta intentando agregar no cuenta con inventario`];
+        return `El producto que esta intentando agregar no cuenta con inventario`;
     }
 
     return inventario;
 }
 
-const getCliente = async (idCliente: number) => {
+
+/**
+ * Obtener datos del cliente
+ * 
+ * @param idCliente id del cliente
+ * @returns Promise<AxiosResponse> de cliente
+ */
+const getCliente = async (idCliente: number): Promise<AxiosResponse> => {
     const cliente = await axios.get<{
         id: number,
         nombre: string,
@@ -72,131 +126,78 @@ const getCliente = async (idCliente: number) => {
     return cliente;
 } 
 
-export const vaidateCreateProducto = async (body: { idProducto: number, idCarrito: number, cantidad: number }): Promise<[boolean, string | null]> => {
-    const carrito = await Carrito.findByPk(body.idCarrito);
 
-    if (!carrito) {
-        return [false, `El carrito con el id especificado no existe`];
+export const vaidateCreateProducto = async (body: { idProducto: number, idCarrito: number, cantidad: number }): Promise<[boolean, string | null]> => {
+    // Obtener el carrito
+    const carrito = await getCarrito(body.idCarrito);
+
+    if (typeof carrito === 'string') {
+        return [false, carrito];
     }
 
-    const productosCarrito = await ProductoCarrito.findAll({
-        where: {
-            idCarrito: body.idCarrito
-        }
-    });
+    // Obtener productos dentro del carrito y su cantidad
+    const [productosCarrito, cantidadProductosEnElCarrito] = await getProductosCarrito(body.idCarrito);
 
     let indexProducto = productosCarrito.find((producto) => producto.idProducto === body.idProducto);
     if (indexProducto) {
         return [false, `El producto que intenta agregar al carrito ya existe, intente modificandolo`];
     }
 
-    let cantidadProductosEnElCarrito = 0;
-    if (productosCarrito) {
-        for (let i = 0; i < productosCarrito.length; i++) {
-            cantidadProductosEnElCarrito += productosCarrito[i].cantidad;
-        }
+    // Obtener cliente
+    const cliente = await getCliente(carrito?.idCliente);
+
+    // Obtener inventario del producto
+    const inventario = await getInventario(body.idProducto);
+
+    if (typeof inventario === 'string') {
+        return [false, inventario];
     }
 
-    const cliente = await axios.get<{
-        id: number,
-        nombre: string,
-        apellido: string,
-        correo: string,
-        cupo: number,
-        createdAt: string,
-        updatedAt: string
-    }>(`http://localhost:3002/api/clientes/${carrito?.idCliente}`);
-
-    const inventario = await axios.get<{
-        id: number,
-        nombre: string,
-        precio: number,
-        descripcion: string,
-        createdAt: string,
-        updatedAt: string,
-        inventario: {
-            id: number,
-            idProducto: number,
-            stock: number,
-            createdAt: string,
-            updatedAt: string
-        }
-    }>(`http://localhost:3000/api/producto/${body.idProducto}`);
-
-    if (!inventario.data) {
-        return [false, `El id del producto no existe`];
-    }
-
-    if (!inventario.data.inventario) {
-        return [false, `El producto que esta intentando agregar no cuenta con inventario`];
-    }
-
+    // Verificar el cupo de compra del cliente y el stock del producto con respecto a la cantidad a agregar al carrito
     if (cliente.data.cupo < body.cantidad + cantidadProductosEnElCarrito) {
         return [false, `La cantidad que esta intentando agregar sobrepasa el cupo de compra del cliente`];
-
     }
 
-    if (inventario.data.inventario.stock < body.cantidad + cantidadProductosEnElCarrito) {
+    if (inventario.data.inventario.stock < body.cantidad) {
         return [false, `La cantidad que esta intentando agregar sobrepasa el stock en inventario del producto`];
     }
 
+    // Todas las validaciones correctas
     return [true, null];
 
 }
 
 
-export const validateUpdateProducto = async (body: { cantidad: number }, productoCarrito: ProductoCarritoInstance): Promise<[boolean, string | null]> => {
-    
-    
-    const productosCarrito = await ProductoCarrito.findAll({
-        where: {
-            idCarrito: productoCarrito.idCarrito
-        }
-    });
 
-    let cantidadProductosEnElCarrito = 0;
-    if (productosCarrito) {
-        for (let i = 0; i < productosCarrito.length; i++) {
-            if (productosCarrito[i].id !== productoCarrito.id) {
-                cantidadProductosEnElCarrito += productosCarrito[i].cantidad;
-            }
-        }
+export const validateUpdateProducto = async (body: { cantidad: number }, productoCarrito: ProductoCarritoInstance): Promise<[boolean, string | null]> => {
+    // Obtener el carrito
+    const carrito = await getCarrito(productoCarrito.idCarrito);
+
+    if (typeof carrito === 'string') {
+        return [false, carrito];
     }
 
-    const carrito = await Carrito.findByPk(productoCarrito.idCarrito);
-    const cliente = await axios.get<{
-        id: number,
-        nombre: string,
-        apellido: string,
-        correo: string,
-        cupo: number,
-        createdAt: string,
-        updatedAt: string
-    }>(`http://localhost:3002/api/clientes/${carrito?.idCliente}`);
+    // Obtener productos dentro del carrito y su cantidad
+    const [productosCarrito, cantidadProductosEnElCarrito] = await getProductosCarritoUpdate(productoCarrito.idCarrito, productoCarrito.id);
+    console.log()
 
-    const inventarioProducto = await axios.get<{
-        id: number,
-        nombre: string,
-        precio: number,
-        descripcion: string,
-        createdAt: string,
-        updatedAt: string,
-        inventario: {
-            id: number,
-            idProducto: number,
-            stock: number,
-            createdAt: string,
-            updatedAt: string
-        }
-    }>(`http://localhost:3000/api/producto/${productoCarrito.idProducto}`);
+    // Obtener cliente
+    const cliente = await getCliente(carrito?.idCliente);
+
+    // Obtener inventario del producto
+    const inventario = await getInventario(productoCarrito.idProducto);
+
+    if (typeof inventario === 'string') {
+        return [false, inventario];
+    }
 
 
+    // Verificar el cupo de compra del cliente y el stock del producto con respecto a la cantidad a agregar al carrito
     if (cliente.data.cupo < body.cantidad + cantidadProductosEnElCarrito) {
         return [false, `La cantidad que esta intentando agregar sobrepasa el cupo de compra del cliente`];
-
     }
 
-    if (inventarioProducto.data.inventario.stock < body.cantidad + cantidadProductosEnElCarrito) {
+    if (inventario.data.inventario.stock < body.cantidad) {
         return [false, `La cantidad que esta intentando agregar sobrepasa el stock en inventario del producto`];
     }
 
