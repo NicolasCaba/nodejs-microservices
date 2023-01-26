@@ -46,7 +46,7 @@ const createInventario = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(201).send(response);
     }
     catch (error) {
-        res.status(400).send({ 'message': 'Error al intentar obtener inventario', error });
+        res.status(400).send({ 'message': 'Error al intentar crear inventario', error });
     }
 });
 exports.createInventario = createInventario;
@@ -62,6 +62,10 @@ const getInventarioById = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const response = yield inventario_1.default.findByPk(id, {
             include: [producto_1.default]
         });
+        if (!response) {
+            res.status(404).send({ 'message': `No se encontro un regitro con el id ${id}` });
+            return;
+        }
         res.status(200).send(response);
     }
     catch (error) {

@@ -27,6 +27,10 @@ const getProductoById = (req, res) => __awaiter(void 0, void 0, void 0, function
         const response = yield producto_1.default.findByPk(id, {
             include: [inventario_1.default]
         });
+        if (!response) {
+            res.status(404).send({ 'message': `No se encontro un regitro con el id ${id}` });
+            return;
+        }
         res.status(200).send(response);
     }
     catch (error) {

@@ -27,11 +27,12 @@ export const getInventario = async (req: Request, res: Response) => {
  */
 export const createInventario = async (req: Request, res: Response) => {
     try {
-        const { body } = req;
+        const {body} = req;
+
         const response = await Inventario.create(body);
         res.status(201).send(response);
     } catch (error) {
-        res.status(400).send({'message': 'Error al intentar obtener inventario', error});
+        res.status(400).send({'message': 'Error al intentar crear inventario', error});
     }
 }
 
@@ -47,6 +48,12 @@ export const getInventarioById = async (req: Request, res: Response) => {
         const response = await Inventario.findByPk(id, {
             include: [Producto]
         });
+
+        if (!response) {
+            res.status(404).send({'message': `No se encontro un regitro con el id ${id}`});
+            return;
+        }
+
         res.status(200).send(response);
     } catch (error) {
         res.status(400).send({'message': 'Error al intentar obtener inventario por id', error});

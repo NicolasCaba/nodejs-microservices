@@ -20,9 +20,9 @@ const inventario_1 = __importDefault(require("./routes/inventario"));
 const producto_1 = __importDefault(require("./routes/producto"));
 class ExpressServer {
     constructor() {
-        this.basePath = '/api';
+        this.basePath = "/api";
         this.app = (0, express_1.default)();
-        this.port = process.env.PORT || '3000';
+        this.port = process.env.PORT || "3000";
         this.dbConnection();
         this.configs();
         this.routes();
@@ -32,7 +32,7 @@ class ExpressServer {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield dbConnection_1.default.authenticate();
-                console.log('Conexion con la base de datos establecida.');
+                console.log("Conexion con la base de datos establecida.");
             }
             catch (error) {
                 throw new Error(`Error en la conexion a la base de datos: ${error}`);
@@ -54,6 +54,9 @@ class ExpressServer {
         this.app.listen(this.port, () => {
             console.log(`App corriendo en puerto ${this.port}`);
         });
+    }
+    getApp() {
+        return this.app;
     }
 }
 exports.default = ExpressServer;
