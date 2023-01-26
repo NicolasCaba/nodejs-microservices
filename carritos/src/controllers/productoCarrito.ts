@@ -2,7 +2,7 @@ import axios from "axios";
 import { Request, Response } from "express";
 import Carrito from "../models/carrito";
 import ProductoCarrito from "../models/productoCarrito";
-import { vaidateCreateProducto, validateUpdateProducto } from "../validators/productoCarrito";
+import { vaidateCreateProducto, validateUpdateProducto } from "../validators/productoCarritoStockCupo";
 
 /**
  * POST create producto carrito
@@ -48,6 +48,12 @@ export const getProductosCarrito = async (req: Request, res: Response) => {
                 idCarrito: id
             }
         });
+
+        if (response.length === 0) {
+            res.status(404).send({'message': `No existen productos dentro del carrito`});
+            return;
+        }
+
         res.status(200).send(response);
     } catch (error) {
         res.status(500).send({'message': 'Error al itentar obtener los productos del carrito', error})

@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateGetProductoById = void 0;
+exports.validateCreateCarrito = void 0;
 const express_validator_1 = require("express-validator");
-exports.validateGetProductoById = [
-    (0, express_validator_1.param)('id', 'El paramentro id debe ser un número')
+exports.validateCreateCarrito = [
+    (0, express_validator_1.check)('idCliente', 'El campo id cliente debe existir y ser un número')
         .exists()
         .notEmpty()
         .isInt(),

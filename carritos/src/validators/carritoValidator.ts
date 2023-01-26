@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { validationResult, param } from 'express-validator';
+import { check, validationResult } from 'express-validator';
 
-export const validateGetProductoById = [
-  param('id', 'El paramentro id debe ser un número')
+export const validateCreateCarrito = [
+  check('idCliente', 'El campo id cliente debe existir y ser un número')
     .exists()
     .notEmpty()
     .isInt(),

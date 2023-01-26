@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProductoCarrito = exports.updateProductoCarrito = exports.getProductosCarrito = exports.createProductoCarrito = void 0;
 const productoCarrito_1 = __importDefault(require("../models/productoCarrito"));
-const productoCarrito_2 = require("../validators/productoCarrito");
+const productoCarritoStockCupo_1 = require("../validators/productoCarritoStockCupo");
 /**
  * POST create producto carrito
  *
@@ -28,7 +28,7 @@ const createProductoCarrito = (req, res) => __awaiter(void 0, void 0, void 0, fu
             idCarrito: req.body.idCarrito,
             cantidad: req.body.cantidad
         };
-        const validateResponse = yield (0, productoCarrito_2.vaidateCreateProducto)(body);
+        const validateResponse = yield (0, productoCarritoStockCupo_1.vaidateCreateProducto)(body);
         if (!validateResponse[0]) {
             res.status(400).send({ 'message': validateResponse[1] });
             return;
@@ -55,6 +55,10 @@ const getProductosCarrito = (req, res) => __awaiter(void 0, void 0, void 0, func
                 idCarrito: id
             }
         });
+        if (response.length === 0) {
+            res.status(404).send({ 'message': `No existen productos dentro del carrito` });
+            return;
+        }
         res.status(200).send(response);
     }
     catch (error) {
@@ -79,7 +83,7 @@ const updateProductoCarrito = (req, res) => __awaiter(void 0, void 0, void 0, fu
             res.status(400).send({ 'message': `No existe un producto con el id ${id}` });
             return;
         }
-        const validateResponse = yield (0, productoCarrito_2.validateUpdateProducto)(body, producto);
+        const validateResponse = yield (0, productoCarritoStockCupo_1.validateUpdateProducto)(body, producto);
         if (!validateResponse[0]) {
             res.status(400).send({ 'message': validateResponse[1] });
             return;
