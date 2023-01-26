@@ -79,7 +79,7 @@ export const updateProductoCarrito = async (req: Request, res: Response) => {
         const producto = await ProductoCarrito.findByPk(id);
 
         if (!producto) {
-            res.status(400).send({'message': `No existe un producto con el id ${id}`});
+            res.status(404).send({'message': `No existe un producto con el id ${id}`});
             return;
         }
 
@@ -111,7 +111,7 @@ export const deleteProductoCarrito = async (req: Request, res: Response) => {
         const producto = await ProductoCarrito.findByPk(id);
 
         if (!producto) {
-            res.status(400).send({'message': `No existe un producto con el id ${id}`});
+            res.status(404).send({'message': `No existe un producto con el id ${id}`});
             return;
         }
 

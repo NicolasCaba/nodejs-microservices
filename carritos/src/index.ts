@@ -4,6 +4,6 @@ import ExpressServer from "./expressServer";
 // environment vars config
 dotenv.config();
 
-const expressServer = new ExpressServer();
+export const expressServer = new ExpressServer();
 
 expressServer.listen();

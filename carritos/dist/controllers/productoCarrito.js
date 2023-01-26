@@ -80,7 +80,7 @@ const updateProductoCarrito = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { id } = req.params;
         const producto = yield productoCarrito_1.default.findByPk(id);
         if (!producto) {
-            res.status(400).send({ 'message': `No existe un producto con el id ${id}` });
+            res.status(404).send({ 'message': `No existe un producto con el id ${id}` });
             return;
         }
         const validateResponse = yield (0, productoCarritoStockCupo_1.validateUpdateProducto)(body, producto);
@@ -107,7 +107,7 @@ const deleteProductoCarrito = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { id } = req.params;
         const producto = yield productoCarrito_1.default.findByPk(id);
         if (!producto) {
-            res.status(400).send({ 'message': `No existe un producto con el id ${id}` });
+            res.status(404).send({ 'message': `No existe un producto con el id ${id}` });
             return;
         }
         const response = yield producto.destroy();
