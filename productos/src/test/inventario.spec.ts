@@ -1,6 +1,5 @@
 import request from 'supertest';
 import ExpressServer from '../expressServer';
-import { expressServer } from '../index';
 
 
 const app = new ExpressServer().getApp();

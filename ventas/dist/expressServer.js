@@ -53,5 +53,8 @@ class ExpressServer {
             console.log(`App corriendo en puerto ${this.port}`);
         });
     }
+    getApp() {
+        return this.app;
+    }
 }
 exports.default = ExpressServer;

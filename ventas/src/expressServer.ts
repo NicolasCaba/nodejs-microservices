@@ -48,6 +48,10 @@ class ExpressServer {
         });
     }
 
+    getApp(): Application {
+        return this.app;
+    }
+
 }
 
 export default ExpressServer;
