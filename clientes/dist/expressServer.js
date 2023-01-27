@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const dbConnection_1 = __importDefault(require("./config/dbConnection"));
-const modelEntityRelationship_1 = __importDefault(require("./models/modelEntityRelationship"));
 const cliente_1 = __importDefault(require("./routes/cliente"));
 class ExpressServer {
     constructor() {
@@ -43,7 +42,6 @@ class ExpressServer {
         this.app.use(express_1.default.json());
     }
     modelEntityRelationship() {
-        (0, modelEntityRelationship_1.default)();
     }
     routes() {
         this.app.use(this.basePath, cliente_1.default);
@@ -52,6 +50,9 @@ class ExpressServer {
         this.app.listen(this.port, () => {
             console.log(`App corriendo en puerto ${this.port}`);
         });
+    }
+    getApp() {
+        return this.app;
     }
 }
 exports.default = ExpressServer;

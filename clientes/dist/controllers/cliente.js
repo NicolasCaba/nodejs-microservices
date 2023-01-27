@@ -40,6 +40,9 @@ const getClienteById = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id } = req.params;
         const response = yield cliente_1.default.findByPk(id);
+        if (!response) {
+            res.status(404).send({ 'message': `No se encontro cliente por el id ${id}` });
+        }
         res.status(200).send(response);
     }
     catch (error) {

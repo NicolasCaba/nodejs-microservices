@@ -1,7 +1,6 @@
 import cors from "cors";
 import express, { Application } from "express";
 import sequelize from "./config/dbConnection";
-import defineModelEntityRelationShip from "./models/modelEntityRelationship";
 import routerCliente from "./routes/cliente";
 
 
@@ -35,7 +34,7 @@ class ExpressServer {
     }
 
     modelEntityRelationship() {
-        defineModelEntityRelationShip();
+        
     }
 
     routes(): void {
@@ -46,6 +45,10 @@ class ExpressServer {
         this.app.listen(this.port, () => {
             console.log(`App corriendo en puerto ${this.port}`);
         });
+    }
+
+    getApp(): Application {
+        return this.app;
     }
 
 }

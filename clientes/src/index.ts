@@ -6,4 +6,6 @@ dotenv.config();
 
 const expressServer = new ExpressServer();
 
-expressServer.listen();
+if (process.env.NODE_ENV !== 'test') {
+    expressServer.listen();
+}

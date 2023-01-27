@@ -8,4 +8,6 @@ const expressServer_1 = __importDefault(require("./expressServer"));
 // environment vars config
 dotenv_1.default.config();
 const expressServer = new expressServer_1.default();
-expressServer.listen();
+if (process.env.NODE_ENV !== 'test') {
+    expressServer.listen();
+}

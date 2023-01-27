@@ -3,6 +3,9 @@ import { Router } from "express";
 // Controllers
 import { getClientes, getClienteById } from "../controllers/cliente"
 
+// Middlewares
+import { validateGetClienteById } from "../validators/clienteValidator";
+
 const router = Router();
 
 /**
@@ -15,7 +18,7 @@ router.get('/clientes', getClientes);
  * GET
  * Obtener cliente por id
  */
-router.get('/clientes/:id', getClienteById);
+router.get('/clientes/:id', validateGetClienteById, getClienteById);
 
 
 export default router;
