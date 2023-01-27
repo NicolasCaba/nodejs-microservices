@@ -92,7 +92,7 @@ const getInventario = async (idProducto: number): Promise<AxiosResponse | string
             createdAt: string,
             updatedAt: string
         }
-    }>(`http://localhost:3000/api/producto/${idProducto}`);
+    }>(`http://productos:3000/api/producto/${idProducto}`);
 
     if (!inventario.data) {
         return `El id del producto no existe`;
@@ -121,7 +121,7 @@ const getCliente = async (idCliente: number): Promise<AxiosResponse> => {
         cupo: number,
         createdAt: string,
         updatedAt: string
-    }>(`http://localhost:3002/api/clientes/${idCliente}`);
+    }>(`http://clientes:3002/api/clientes/${idCliente}`);
 
     return cliente;
 } 
